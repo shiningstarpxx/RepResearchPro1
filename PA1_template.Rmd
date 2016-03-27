@@ -1,3 +1,8 @@
+### Project Doc
+Download the file from the course website.
+
+Answering questions given in the page.
+
 #### Loading and Preprocessing the data
 unzip the file, get "activity.csv"
 
@@ -69,6 +74,7 @@ try to look at the "steps_by_day"
 2. Make a histogram of the total number of steps taken each day
 
 		hist(steps_by_day$steps, main = paste("Total Steps Each Day"), col="red", xlab="Num of Steps")
+![Result](https://github.com/shiningstarpxx/RepResearchPro1/blob/master/figure/StepsEachDay.png)
 
 3. Calculate and report the mean and median of the total number of steps taken per day
 
@@ -84,6 +90,7 @@ try to look at the "steps_by_day"
 
 		> steps_by_interval <- aggregate(steps ~ interval, activity, mean)
 		> plot(steps_by_interval$interval,steps_by_interval$steps, type="l", 		xlab="Interval", ylab="Num of Steps",main="Average Number of Steps per Day by Interval")
+![Result](https://github.com/shiningstarpxx/RepResearchPro1/blob/master/figure/StepsPerDayByInterval.png)
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 		> max_interval <- steps_by_interval[which.max(steps_by_interval$steps), 1]
@@ -123,6 +130,7 @@ From the following result, it is clearly that replace is successful.
 		hist(steps_by_day_i$steps, main = paste("Total Steps Each Day"), col = "green", xlab = "Num of Steps")
 		hist(steps_by_day$steps, main = paste("Total Steps Each Day"), col = "red", xlab = "Num of Steps", add = T)
 		legend("topright", c("Modified", "Original"), col = c("green", "red"), lwd = 10)
+![Result](https://github.com/shiningstarpxx/RepResearchPro1/blob/master/figure/ContrastModifyOrigin.png)
 Calculate the new dataset mean & median
 
 		> complete_mean <- mean(steps_by_day_i$steps)
@@ -163,3 +171,4 @@ Calcute the total diffierence
 		> library(lattice)
 		> xyplot(steps_by_interval_i$steps ~ steps_by_interval_i$interval | steps_by_interval_i$work_days, main = "Average Steps By Interval", xlab = "Interval", ylab = "Steps", layout = c(1, 2), type = "l")
 		>
+![Result](https://github.com/shiningstarpxx/RepResearchPro1/blob/master/figure/ContrastWeekdayWeenkend.png)
