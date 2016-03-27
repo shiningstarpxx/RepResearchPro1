@@ -1,0 +1,165 @@
+#### Loading and Preprocessing the data
+unzip the file, get "activity.csv"
+
+	unzip("activity.zip")
+Reading the data into 'activity', and show it by summary and review first few data
+
+	activity <- read.csv("activity.csv")
+show data in "str" format
+
+	str(activity)
+the "str" result is,
+
+	'data.frame':	17568 obs. of  3 variables:
+ 	$ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+	$ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+ 	$ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+detect what the data look like,
+
+	head(activity)
+the "head" result is,
+
+	  steps       date interval
+	1    NA 2012-10-01        0
+	2    NA 2012-10-01        5
+	3    NA 2012-10-01       10
+	4    NA 2012-10-01       15
+	5    NA 2012-10-01       20
+	6    NA 2012-10-01       25
+finally, use summary to picture the data frame
+
+	summary(activity)
+the "summary" result is,
+
+     steps                date          interval
+	 Min.   :  0.00   2012-10-01:  288   Min.   :   0.0
+ 	 1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8
+ 	 Median :  0.00   2012-10-03:  288   Median :1177.5
+	 Mean   : 37.38   2012-10-04:  288   Mean   :1177.5
+	 3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2
+	 Max.   :806.00   2012-10-06:  288   Max.   :2355.0
+	 NA's   :2304     (Other)   :15840
+Refine the date column of "activity".
+
+		> library(lubridate)
+		> activity$date <- ymd(activity$date)
+		> str(activity)
+
+the result is,
+
+	'data.frame':	17568 obs. of  3 variables:
+ 	$ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+ 	$ date    : POSIXct, format: "2012-10-01" "2012-10-01" ...
+ 	$ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+
+#### What is mean total number of steps taken per day?
+1. Calculate the total number of steps taken per day
+
+		steps_by_day <- aggregate(steps ~ date, activity, sum)
+try to look at the "steps_by_day"
+
+		> head(steps_by_day)
+	    	    date steps
+		1 2012-10-02   126
+		2 2012-10-03 11352
+		3 2012-10-04 12116
+		4 2012-10-05 13294
+		5 2012-10-06 15420
+		6 2012-10-07 11015
+2. Make a histogram of the total number of steps taken each day
+
+		hist(steps_by_day$steps, main = paste("Total Steps Each Day"), col="red", xlab="Num of Steps")
+
+3. Calculate and report the mean and median of the total number of steps taken per day
+
+		> mean_steps <- mean(steps_by_day$steps)
+		> mean_steps
+		[1] 10766.19
+		> median_steps <- median(steps_by_day$steps)
+		> median_steps
+		[1] 10765
+
+####What is the average daily activity pattern?
+1. Make a time series plot (i.e. 𝚝𝚢𝚙𝚎 = "𝚕") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+		> steps_by_interval <- aggregate(steps ~ interval, activity, mean)
+		> plot(steps_by_interval$interval,steps_by_interval$steps, type="l", 		xlab="Interval", ylab="Num of Steps",main="Average Number of Steps per Day by Interval")
+2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+		> max_interval <- steps_by_interval[which.max(steps_by_interval$steps), 1]
+		>
+		> max_interval
+		[1] 835
+#### Imputing missing values
+1. Calculate and report the total number of missing values in the dataset
+
+		> incomplete <- sum(!complete.cases(activity)
+		> incomplete
+		[1] 2304
+
+2. Devise a strategy for filling in all of the missing values in the dataset.
+Replace the NA value with the average value,
+3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+		> complete_activity <- transform(activity, steps = ifelse(is.na(activity$steps), 		steps_by_interval$steps[match(activity$interval, steps_by_interval$interval)], activity$steps))
+From the following result, it is clearly that replace is successful.
+
+		> str(complete_activity)
+		'data.frame':	17568 obs. of  3 variables:
+		 $ steps   : int  91 18 7 8 4 111 28 46 0 78 ...
+		 $ date    : POSIXct, format: "2012-10-01" "2012-10-01" ...
+		 $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+		> summary(complete_activity)
+		     steps              date               interval
+		 Min.   :    0.0   Min.   :2012-10-01   Min.   :   0.0
+		 1st Qu.:    0.0   1st Qu.:2012-10-16   1st Qu.: 588.8
+		 Median :    0.0   Median :2012-10-31   Median :1177.5
+		 Mean   :  292.3   Mean   :2012-10-31   Mean   :1177.5
+		 3rd Qu.:   43.0   3rd Qu.:2012-11-15   3rd Qu.:1766.2
+		 Max.   :10927.0   Max.   :2012-11-30   Max.   :2355.0
+
+4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
+
+		hist(steps_by_day_i$steps, main = paste("Total Steps Each Day"), col = "green", xlab = "Num of Steps")
+		hist(steps_by_day$steps, main = paste("Total Steps Each Day"), col = "red", xlab = "Num of Steps", add = T)
+		legend("topright", c("Modified", "Original"), col = c("green", "red"), lwd = 10)
+Calculate the new dataset mean & median
+
+		> complete_mean <- mean(steps_by_day_i$steps)
+		> complete_mean
+		[1] 10766.19
+		> complete_median <- median(steps_by_day_i$steps)
+		> complete_median
+		[1] 10766.19
+Calcute the difference between the new dataset and old one
+
+		> mean_diff <- complete_mean - mean_steps
+		> mean_diff
+		[1] 0
+		> median_diff <- complete_median - median_steps
+		> median_diff
+		[1] 1.188679
+Calcute the total diffierence
+
+		> total_diff <- sum(steps_by_day_i$steps) - sum(steps_by_day$steps)
+		> total_diff
+		[1] 86129.51
+
+####Are there differences in activity patterns between weekdays and weekends?
+
+
+		> week_days <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+		> complete_activity$work_days = as.factor(ifelse(is.element(weekdays(as.Date(complete_activity$date)), week_days), "WeekDay", "Weekend"))
+		> summary(complete_activity)
+	     steps                date          interval        work_days
+	 Min.   :  0.00   2012-10-01:  288   Min.   :   0.0   WeekDay:12960
+	 1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8   Weekend: 4608
+	 Median :  0.00   2012-10-03:  288   Median :1177.5
+	 Mean   : 37.38   2012-10-04:  288   Mean   :1177.5
+	 3rd Qu.: 27.00   2012-10-05:  288   3rd Qu.:1766.2
+	 Max.   :806.00   2012-10-06:  288   Max.   :2355.0
+	                  (Other)   :15840
+		> steps_by_interval_i <- aggregate(steps ~ interval + work_days, complete_activity, mean)
+		> library(lattice)
+		> xyplot(steps_by_interval_i$steps ~ steps_by_interval_i$interval | steps_by_interval_i$work_days, main = "Average Steps By Interval", xlab = "Interval", ylab = "Steps", layout = c(1, 2), type = "l")
+		>
